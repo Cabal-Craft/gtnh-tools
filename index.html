@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>GTNH Tools</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;600&family=Pixelify+Sans:wght@700&display=swap">
+<style>
+:root { --bg: #e9ecef; --panel: #f7f8f9; --line: #c3cad2; --fg: #1d242c; --muted: #5b6672; --accent: #2f6fb0; }
+@media (prefers-color-scheme: dark) {
+  :root { --bg: #14181d; --panel: #1c2128; --line: #333c47; --fg: #e3e8ee; --muted: #8e9aa7; --accent: #6aa8e8; color-scheme: dark; }
+}
+body { margin: 0; background: var(--bg); color: var(--fg); font: 16px/1.5 "Barlow", "Segoe UI", system-ui, sans-serif;
+  padding: 48px max(16px, env(safe-area-inset-right, 0px)) 48px max(16px, env(safe-area-inset-left, 0px)); }
+main { max-width: 720px; margin: 0 auto; display: flex; flex-direction: column; gap: 20px; }
+h1 { font: 700 32px/1 "Pixelify Sans", "Courier New", monospace; margin: 0; }
+p { margin: 0; color: var(--muted); }
+a.tool { display: block; padding: 16px 18px; background: var(--panel); border: 1px solid var(--line); border-radius: 8px;
+  color: inherit; text-decoration: none; }
+a.tool:hover, a.tool:focus-visible { border-color: var(--accent); }
+a.tool b { display: block; font-size: 18px; color: var(--accent); }
+</style>
+</head>
+<body>
+<main>
+  <h1>GTNH Tools</h1>
+  <p>Reference tools for GregTech: New Horizons, built from data exported out of a real game instance.</p>
+  <a class="tool" href="dust-atlas/"><b>Dust Atlas</b>Every dust in GTNH 2.9.0-RC1 as a clickable flowchart: what makes it, and what each machine turns it into.</a>
+</main>
+</body>
+</html>

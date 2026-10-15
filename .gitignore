@@ -1,0 +1,8 @@
+dust-atlas/dumper/build/
+dust-atlas/dumper/.gradle/
+dust-atlas/dumper/run/
+.gradle/
+__pycache__/
+*.pyc
+.idea/
+*.iml

@@ -1,0 +1,529 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>GTNH Dust Atlas</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600&family=JetBrains+Mono:wght@400;600&family=Pixelify+Sans:wght@500;700&display=swap">
+<style>
+/* Layout: a three-lane flowchart board. Sources (made by) feed in from the left, the focused item sits in the middle,
+   processing and uses fan out to the right. Wires connect the item to each machine group. */
+:root {
+  --bg: #e9ecef;          /* machine-casing light steel */
+  --panel: #f7f8f9;
+  --panel-2: #dde2e7;
+  --line: #c3cad2;
+  --fg: #1d242c;
+  --muted: #5b6672;
+  --accent: #2f6fb0;      /* GT "LV-blue" accent */
+  --wire: #8b98a6;
+  --wire-hot: #2f6fb0;
+  --focus-ring: #e0a000;
+  /* Minecraft tooltip: stays the same in both themes on purpose */
+  --tt-bg: rgba(16, 0, 16, .95);
+  --tt-b1: #5000ff;
+  --tt-b2: #28007f;
+  --tt-fg: #ffffff;
+  --tt-gray: #aaaaaa;
+  --tt-dark: #555555;
+  --tt-yellow: #ffff55;
+  --f-display: "Pixelify Sans", "Courier New", monospace;
+  --f-body: "Barlow", "Segoe UI", system-ui, sans-serif;
+  --f-data: "JetBrains Mono", ui-monospace, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #14181d; --panel: #1c2128; --panel-2: #262d36; --line: #333c47; --fg: #e3e8ee; --muted: #8e9aa7;
+    --accent: #6aa8e8; --wire: #4a5563; --wire-hot: #6aa8e8; --focus-ring: #f0b429; color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #14181d; --panel: #1c2128; --panel-2: #262d36; --line: #333c47; --fg: #e3e8ee; --muted: #8e9aa7;
+  --accent: #6aa8e8; --wire: #4a5563; --wire-hot: #6aa8e8; --focus-ring: #f0b429; color-scheme: dark;
+}
+* { box-sizing: border-box; }
+html, body { height: 100%; }
+body { margin: 0; }
+[hidden] { display: none !important; }
+body {
+  background: var(--bg); color: var(--fg); font: 15px/1.45 var(--f-body);
+  padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 0 32px;
+}
+button, input { font: inherit; color: inherit; }
+:focus-visible { outline: 2px solid var(--focus-ring); outline-offset: 2px; }
+
+/* ---------- header ---------- */
+.top {
+  position: sticky; top: env(safe-area-inset-top, 0px); z-index: 20; background: var(--bg);
+  display: flex; flex-wrap: wrap; align-items: center; gap: 12px 20px; padding-block: 14px 12px;
+  border-bottom: 1px solid var(--line);
+}
+.brand { display: flex; align-items: baseline; gap: 10px; }
+.brand h1 { font: 700 22px/1 var(--f-display); margin: 0; letter-spacing: .02em; }
+.brand small { font: 12px var(--f-data); color: var(--muted); }
+.search { position: relative; flex: 1 1 320px; max-width: 560px; min-width: 0; }
+.search input {
+  width: 100%; padding: 9px 12px 9px 34px; border: 1px solid var(--line); border-radius: 6px; background: var(--panel);
+}
+.search svg { position: absolute; left: 10px; top: 50%; transform: translateY(-50%); width: 16px; height: 16px; fill: var(--muted); }
+.results {
+  position: absolute; left: 0; right: 0; top: calc(100% + 4px); max-height: min(60vh, 520px); overflow: auto;
+  background: var(--panel); border: 1px solid var(--line); border-radius: 6px; box-shadow: 0 10px 30px rgba(0,0,0,.18);
+  padding: 4px;
+}
+.res { display: flex; align-items: center; gap: 10px; padding: 5px 8px; border-radius: 4px; cursor: pointer; }
+.res[aria-selected="true"], .res:hover { background: var(--panel-2); }
+.res .nm { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.res .tag { font: 11px var(--f-data); color: var(--muted); white-space: nowrap; }
+.opts { display: flex; flex-wrap: wrap; gap: 6px 14px; font-size: 13px; color: var(--muted); }
+.opts label { display: flex; align-items: center; gap: 6px; cursor: pointer; }
+.trail { display: flex; flex-wrap: wrap; gap: 4px; padding-block: 10px 0; min-height: 34px; }
+.crumb {
+  display: inline-flex; align-items: center; gap: 6px; padding: 2px 8px 2px 3px; border-radius: 999px;
+  background: var(--panel); border: 1px solid var(--line); font-size: 12px; cursor: pointer; max-width: 220px;
+}
+.crumb span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.crumb.cur { border-color: var(--accent); }
+
+/* ---------- icons ---------- */
+.ic {
+  display: inline-block; width: 32px; height: 32px; flex: none; image-rendering: pixelated;
+  background-repeat: no-repeat; position: relative;
+}
+.ic.s20 { width: 20px; height: 20px; }
+.ic.s64 { width: 64px; height: 64px; }
+.ic.noimg { background: var(--panel-2); border-radius: 4px; }
+.ic.noimg::after {
+  content: attr(data-l); position: absolute; inset: 0; display: grid; place-items: center;
+  font: 600 11px var(--f-data); color: var(--muted);
+}
+.ic.s64.noimg::after { font-size: 22px; }
+
+/* ---------- board ---------- */
+.board {
+  position: relative; display: grid; grid-template-columns: minmax(0, 1fr) minmax(260px, 340px) minmax(0, 1fr);
+  gap: 56px; align-items: start; padding-block: 18px;
+}
+.wires { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; overflow: visible; }
+.wires path { fill: none; stroke: var(--wire); stroke-width: 1.5; }
+.wires path.hot { stroke: var(--wire-hot); stroke-width: 2.5; }
+.lane { display: flex; flex-direction: column; gap: 14px; min-width: 0; }
+.lane > h2 {
+  margin: 0; font: 600 12px var(--f-data); letter-spacing: .1em; text-transform: uppercase; color: var(--muted);
+  display: flex; justify-content: space-between; gap: 8px;
+}
+.lane.left > h2 { flex-direction: row-reverse; text-align: right; }
+.empty { color: var(--muted); font-size: 13px; padding: 10px 0; }
+.hiddennote { font-size: 12px; color: var(--muted); }
+.hiddennote button { background: none; border: 0; padding: 0; color: var(--accent); cursor: pointer; text-decoration: underline; }
+
+/* focus node */
+.focus {
+  position: sticky; top: calc(env(safe-area-inset-top, 0px) + 150px);
+  background: var(--panel); border: 2px solid var(--fg); border-radius: 8px; padding: 18px; display: flex;
+  flex-direction: column; gap: 12px; z-index: 2;
+}
+.focus .head { display: flex; gap: 14px; align-items: center; }
+.focus h3 { margin: 0; font: 700 21px/1.15 var(--f-display); text-wrap: balance; overflow-wrap: anywhere; }
+.focus .formula { font: 600 15px var(--f-data); color: var(--accent); overflow-wrap: anywhere; }
+.chips { display: flex; flex-wrap: wrap; gap: 5px; }
+.chip { font: 11px var(--f-data); padding: 2px 7px; border-radius: 4px; background: var(--panel-2); color: var(--muted); }
+.kv { display: grid; grid-template-columns: auto 1fr; gap: 3px 12px; font-size: 13px; }
+.kv dt { color: var(--muted); }
+.kv dd { margin: 0; min-width: 0; overflow-wrap: anywhere; font-family: var(--f-data); font-size: 12px; }
+.sibs { display: flex; flex-wrap: wrap; gap: 6px; }
+.sib { display: flex; align-items: center; gap: 5px; padding: 2px 8px 2px 2px; border: 1px solid var(--line); border-radius: 6px;
+  background: var(--bg); cursor: pointer; font-size: 12px; }
+.sib.cur { border-color: var(--focus-ring); }
+.counts { display: flex; gap: 8px; }
+.counts div { flex: 1; background: var(--bg); border-radius: 6px; padding: 8px 10px; }
+.counts b { display: block; font: 600 20px var(--f-data); font-variant-numeric: tabular-nums; }
+.counts span { font-size: 12px; color: var(--muted); }
+
+/* machine group (a node on the board) */
+.grp { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; min-width: 0; }
+.grp.hot { border-color: var(--wire-hot); }
+.grp > header {
+  display: flex; align-items: center; gap: 10px; padding: 9px 12px; cursor: pointer; user-select: none;
+  border-bottom: 1px solid transparent;
+}
+.grp:not(.closed) > header { border-bottom-color: var(--line); }
+.grp > header h4 { margin: 0; font: 600 14px var(--f-body); flex: 1; min-width: 0; }
+.grp > header .n { font: 12px var(--f-data); color: var(--muted); font-variant-numeric: tabular-nums; }
+.grp > header .car { width: 10px; height: 10px; fill: var(--muted); transition: transform .15s; }
+.grp.closed > header .car { transform: rotate(-90deg); }
+.grp.closed .body { display: none; }
+.body { display: flex; flex-direction: column; }
+.more { margin: 6px 12px 10px; align-self: flex-start; background: none; border: 1px solid var(--line); border-radius: 4px;
+  padding: 3px 10px; font-size: 12px; cursor: pointer; color: var(--accent); }
+
+/* recipe row */
+.rec { display: flex; flex-direction: column; gap: 5px; padding: 9px 12px; border-top: 1px solid var(--line); }
+.rec:first-child { border-top: 0; }
+.flow { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.stacks { display: flex; flex-wrap: wrap; gap: 3px; min-width: 0; }
+.arrow { color: var(--muted); font: 600 16px var(--f-data); }
+.st { position: relative; display: inline-flex; cursor: pointer; border-radius: 3px; padding: 1px; background: var(--bg); }
+.st:hover { background: var(--panel-2); }
+.st.me { box-shadow: 0 0 0 2px var(--focus-ring); }
+.st .q {
+  position: absolute; right: 0; bottom: -1px; font: 700 11px/1 var(--f-data); color: #fff;
+  text-shadow: 1px 1px 0 #3f3f3f, -1px 0 0 #3f3f3f, 0 -1px 0 #3f3f3f; pointer-events: none;
+}
+.st .c {
+  position: absolute; left: 0; top: -1px; font: 700 9px/1 var(--f-data); color: var(--tt-yellow);
+  text-shadow: 1px 1px 0 #3f3f3f; pointer-events: none;
+}
+.st.fl .q { font-size: 9px; }
+.meta { display: flex; flex-wrap: wrap; gap: 4px 10px; font: 11.5px var(--f-data); color: var(--muted); font-variant-numeric: tabular-nums; }
+.tier { padding: 0 5px; border-radius: 3px; color: #fff; font-weight: 600; }
+
+/* Minecraft-style tooltip */
+.tt {
+  position: fixed; z-index: 100; pointer-events: none; max-width: 360px; padding: 5px 7px; font: 14px/1.35 var(--f-body);
+  background: var(--tt-bg); color: var(--tt-fg); border: 2px solid transparent; border-radius: 3px;
+  background-clip: padding-box; box-shadow: 0 0 0 1px var(--tt-bg);
+}
+.tt::before {
+  content: ""; position: absolute; inset: -1px; border-radius: 2px; padding: 1px; pointer-events: none;
+  background: linear-gradient(var(--tt-b1), var(--tt-b2));
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor; mask-composite: exclude;
+}
+.tt .t1 { font-weight: 600; }
+.tt .y { color: var(--tt-yellow); font-family: var(--f-data); font-size: 13px; }
+.tt .g { color: var(--tt-gray); }
+.tt .d { color: var(--tt-dark); font-family: var(--f-data); font-size: 11px; }
+.loading { padding: 60px 0; text-align: center; color: var(--muted); font: 14px var(--f-data); }
+
+@media (max-width: 980px) {
+  .board { grid-template-columns: minmax(0, 1fr); gap: 22px; }
+  .wires { display: none; }
+  .focus { position: static; order: -1; }
+  .lane.left > h2 { flex-direction: row; text-align: left; }
+}
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+</style>
+</head>
+<body>
+<header class="top">
+  <div class="brand"><h1>Dust Atlas</h1><small id="ver">GTNH 2.9.0-RC1</small></div>
+  <div class="search">
+    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M10 2a8 8 0 0 1 6.32 12.9l5.39 5.4-1.41 1.4-5.4-5.39A8 8 0 1 1 10 2zm0 2a6 6 0 1 0 0 12 6 6 0 0 0 0-12z"/></svg>
+    <input id="q" type="search" placeholder="Search dusts: bauxite, Fe, tiny iron, pyrite…" autocomplete="off" aria-label="Search items" role="combobox" aria-expanded="false" aria-controls="results">
+    <div class="results" id="results" role="listbox" hidden></div>
+  </div>
+  <div class="opts">
+    <label><input type="checkbox" id="optDust" checked> Dusts only in search</label>
+    <label><input type="checkbox" id="optRecycle" checked> Hide recycling</label>
+    <label><input type="checkbox" id="optDup" checked> Merge multiblock duplicates</label>
+  </div>
+</header>
+<nav class="trail" id="trail" aria-label="History"></nav>
+<main class="board" id="board"><div class="loading" id="loading">Loading 60,435 recipes…</div></main>
+<div class="tt" id="tt" hidden></div>
+
+<script>
+(() => {
+'use strict';
+const $ = (s, el = document) => el.querySelector(s);
+const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+const store = { get(k, d) { try { const v = localStorage.getItem(k); return v == null ? d : JSON.parse(v); } catch { return d; } },
+                set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch {} } };
+
+// GT voltage tiers (max EU/t per tier) and their in-game colours
+const TIERS = [['ULV', 8, '#7a7a7a'], ['LV', 32, '#6c7a89'], ['MV', 128, '#d97d16'], ['HV', 512, '#c9a800'],
+  ['EV', 2048, '#8b3fc9'], ['IV', 8192, '#2a55d4'], ['LuV', 32768, '#d43aa6'], ['ZPM', 131072, '#1b9e8a'],
+  ['UV', 524288, '#2e9e2e'], ['UHV', 2097152, '#b32424'], ['UEV', 8388608, '#4e9f29'], ['UIV', 33554432, '#1f6e8c'],
+  ['UMV', 134217728, '#a0306b'], ['UXV', 536870912, '#6b2b9c'], ['MAX', Infinity, '#cc2222']];
+const tierOf = eu => TIERS.find(t => Math.abs(eu) <= t[1]);
+
+// Order machine groups the way you'd walk a dust through processing
+const PRIORITY = ['smelting', 'gt.recipe.macerator', 'gt.recipe.centrifuge', 'gt.recipe.electrolyzer',
+  'gt.recipe.thermalcentrifuge', 'gt.recipe.orewasher', 'gt.recipe.simplewasher', 'gt.recipe.chemicalbath',
+  'gt.recipe.sifter', 'gt.recipe.electromagneticseparator', 'gt.recipe.mixer', 'gt.recipe.blastfurnace',
+  'gt.recipe.primitiveblastfurnace', 'gt.recipe.alloysmelter', 'gt.recipe.chemicalreactor', 'gt.recipe.largechemicalreactor',
+  'gt.recipe.autoclave', 'gt.recipe.compressor', 'gt.recipe.implosioncompressor', 'gt.recipe.hammer',
+  'gt.recipe.packager', 'gt.recipe.unpackager', 'crafting'];
+const DUP_OF = { 'gt.recipe.multicentrifuge': 'gt.recipe.centrifuge', 'gt.recipe.multielectro': 'gt.recipe.electrolyzer',
+  'gt.recipe.multimixer': 'gt.recipe.mixer', 'gt.recipe.largechemicalreactor': 'gt.recipe.chemicalreactor',
+  'gt.recipe.fakecuttingsaw': 'gt.recipe.cuttingsaw' };
+const RECYCLERS = new Set(['gt.recipe.macerator', 'gt.recipe.arcfurnace', 'gt.recipe.fluidextractor', 'gt.recipe.pulveriser']);
+const PAGE = 6;
+
+let D, N, M, prod, use, dupHidden, searchIdx, atlasOk = false;
+let history = [], cur = -1, expanded = {}, open = {};
+const opt = { dust: store.get('da.dust', true), recycle: store.get('da.recycle', true), dup: store.get('da.dup', true) };
+$('#optDust').checked = opt.dust; $('#optRecycle').checked = opt.recycle; $('#optDup').checked = opt.dup;
+
+// ---------- icons: 64x64 grid of 32px cells per atlas page ----------
+function iconHTML(i, size = 32) {
+  const n = N[i], cls = size === 64 ? ' s64' : size === 20 ? ' s20' : '';
+  if (!atlasOk) return `<i class="ic noimg${cls}" data-l="${esc((n.n || '?').replace(/[^A-Za-z0-9]/g, '').slice(0, 2))}"></i>`;
+  const p = i >> 12, x = (i & 63), y = (i >> 6) & 63, k = size / 32;
+  return `<i class="ic${cls}" style="background-image:url(atlas/a${p}.png);background-size:${2048 * k}px;background-position:-${x * size}px -${y * size}px"></i>`;
+}
+
+// ---------- load ----------
+Promise.all([fetch('data.json').then(r => r.json()),
+  new Promise(res => { const im = new Image(); im.onload = () => res(true); im.onerror = () => res(false); im.src = 'atlas/a0.png'; })])
+.then(([data, ok]) => {
+  D = data; N = D.nodes; M = D.machines; atlasOk = ok;
+  $('#ver').textContent = D.version;
+  prod = Array.from({ length: N.length }, () => []); use = Array.from({ length: N.length }, () => []);
+  // duplicate multiblock recipes: same inputs/outputs as their single-block map
+  const sig = r => r[1].map(s => s[0] + 'x' + s[1]).join(',') + '>' + r[2].map(s => s[0] + 'x' + s[1]).join(',');
+  const mid = Object.fromEntries(M.map((m, i) => [m[0], i]));
+  const base = {};
+  D.recipes.forEach(r => { const id = M[r[0]][0]; if (Object.values(DUP_OF).includes(id)) (base[id] ||= new Set()).add(sig(r)); });
+  dupHidden = new Uint8Array(D.recipes.length);
+  D.recipes.forEach((r, ri) => {
+    const b = DUP_OF[M[r[0]][0]];
+    if (b && base[b] && base[b].has(sig(r))) dupHidden[ri] = 1;
+    new Set(r[2].map(s => s[0])).forEach(n => prod[n].push(ri));
+    new Set(r[1].map(s => s[0])).forEach(n => use[n].push(ri));
+  });
+  searchIdx = N.map((n, i) => ({ i, s: (n.n + ' ' + (n.fo || '') + ' ' + (n.m || '')).toLowerCase(),
+    dust: !!(n.p && n.p.startsWith('dust')) }));
+  const start = parseInt((location.hash.match(/^#n(\d+)$/) || [])[1]);
+  const def = N.findIndex(n => n.n === 'Bauxite Dust');
+  go(Number.isInteger(start) && N[start] ? start : (store.get('da.last', def) ?? def), true);
+}).catch(e => { $('#loading').textContent = 'Could not load data.json: ' + e.message; });
+
+// ---------- navigation ----------
+function go(i, replace) {
+  if (i < 0 || !N[i]) return;
+  if (!replace && history[cur] !== i) { history = history.slice(0, cur + 1); history.push(i); cur = history.length - 1; }
+  else if (replace) { history = [i]; cur = 0; }
+  if (history.length > 24) { history.shift(); cur--; }
+  expanded = {}; open = {};
+  store.set('da.last', i);
+  if (location.hash !== '#n' + i) history_replace('#n' + i);
+  render();
+  window.scrollTo({ top: 0 });
+}
+function history_replace(h) { try { window.history.replaceState(null, '', h); } catch { location.hash = h; } }
+window.addEventListener('hashchange', () => { const m = location.hash.match(/^#n(\d+)$/); if (m && +m[1] !== history[cur]) go(+m[1]); });
+
+function renderTrail() {
+  $('#trail').innerHTML = history.map((n, k) =>
+    `<button class="crumb${k === cur ? ' cur' : ''}" data-h="${k}">${iconHTML(n, 20)}<span>${esc(N[n].n)}</span></button>`).join('');
+}
+$('#trail').addEventListener('click', e => {
+  const b = e.target.closest('.crumb'); if (!b) return;
+  cur = +b.dataset.h; expanded = {}; open = {}; history_replace('#n' + history[cur]); render();
+});
+
+// ---------- rendering ----------
+const isRecycling = (ri, focus) => {
+  const r = D.recipes[ri]; if (!RECYCLERS.has(M[r[0]][0])) return false;
+  return r[1].some(s => !N[s[0]].p && !N[s[0]].f && s[0] !== focus);
+};
+function groups(list, side, focus) {
+  const g = new Map(); let hidRec = 0, hidDup = 0;
+  for (const ri of list) {
+    if (opt.dup && dupHidden[ri]) { hidDup++; continue; }
+    if (opt.recycle && side === 'src' && isRecycling(ri, focus)) { hidRec++; continue; }
+    const m = D.recipes[ri][0];
+    if (!g.has(m)) g.set(m, []); g.get(m).push(ri);
+  }
+  const rank = m => { const p = PRIORITY.indexOf(M[m][0]); return p < 0 ? 100 : p; };
+  const arr = [...g.entries()].sort((a, b) => rank(a[0]) - rank(b[0]) || b[1].length - a[1].length);
+  // cheap recipes first inside a group
+  arr.forEach(([, l]) => l.sort((a, b) => (D.recipes[a][1].length - D.recipes[b][1].length) || Math.abs(D.recipes[a][3]) - Math.abs(D.recipes[b][3])));
+  return { arr, hidRec, hidDup };
+}
+
+function stackHTML(s, focus) {
+  const [n, q, ch, ore] = s, node = N[n];
+  const qs = node.f ? (q >= 1000 ? (q / 1000) + 'B' : q + 'mB') : (q > 1 ? q : q === 0 ? 'NC' : '');
+  return `<span class="st${n === focus ? ' me' : ''}${node.f ? ' fl' : ''}" data-n="${n}" data-q="${q}"${ch != null && ch !== 10000 ? ` data-c="${ch}"` : ''}${ore ? ` data-o="${esc(ore)}"` : ''} tabindex="0">${iconHTML(n)}${qs !== '' ? `<b class="q">${qs}</b>` : ''}${ch != null && ch !== 10000 ? `<b class="c">${+(ch / 100).toFixed(2)}%</b>` : ''}</span>`;
+}
+function recipeHTML(ri, focus) {
+  const r = D.recipes[ri], mid = M[r[0]][0];
+  const meta = [];
+  if (mid === 'crafting') meta.push('crafting grid');
+  else if (mid === 'smelting') meta.push('any furnace');
+  else {
+    if (r[3]) { const t = tierOf(r[3]); meta.push(`<span class="tier" style="background:${t[2]}">${t[0]}</span> ${Math.abs(r[3]).toLocaleString()} EU/t`); }
+    if (r[4]) meta.push(`${+(r[4] / 20).toFixed(2)} s`);
+    if (r[3] && r[4]) meta.push(`${(Math.abs(r[3]) * r[4]).toLocaleString()} EU`);
+    if (r[5] && /blastfurnace|alloyblastsmelter/.test(mid)) meta.push(`${r[5].toLocaleString()} K`);
+  }
+  return `<div class="rec"><div class="flow"><div class="stacks">${r[1].map(s => stackHTML(s, focus)).join('')}</div><span class="arrow" aria-hidden="true">→</span><div class="stacks">${r[2].map(s => stackHTML(s, focus)).join('')}</div></div><div class="meta">${meta.join('<span aria-hidden="true">·</span>')}</div></div>`;
+}
+function groupHTML(m, list, side, focus) {
+  const key = side + m;
+  const isOpen = open[key] ?? (list.length <= 40 || M[m][0] !== 'crafting');
+  const lim = expanded[key] || PAGE;
+  const shown = list.slice(0, lim);
+  const rest = list.length - shown.length;
+  return `<section class="grp${isOpen ? '' : ' closed'}" data-g="${key}">
+    <header tabindex="0" role="button" aria-expanded="${isOpen}"><svg class="car" viewBox="0 0 10 10" aria-hidden="true"><path d="M1 3h8L5 8z"/></svg><h4>${esc(M[m][1])}</h4><span class="n">${list.length.toLocaleString()}</span></header>
+    <div class="body">${shown.map(ri => recipeHTML(ri, focus)).join('')}${rest > 0 ? `<button class="more" data-more="${key}">Show ${Math.min(rest, lim < 50 ? 50 : 200)} more of ${rest.toLocaleString()}</button>` : ''}</div></section>`;
+}
+function siblings(n) {
+  const node = N[n]; if (!node.m) return [];
+  const want = ['dustTiny', 'dustSmall', 'dust', 'dustImpure', 'dustPure'];
+  const found = {};
+  for (let i = 0; i < N.length; i++) { const x = N[i]; if (x.m === node.m && want.includes(x.p) && !(x.p in found)) found[x.p] = i; }
+  return want.filter(p => p in found).map(p => found[p]);
+}
+function focusHTML(n) {
+  const x = N[n], sibs = siblings(n);
+  const kv = [];
+  if (x.m) kv.push(['Material', esc(x.m)]);
+  if (x.o) kv.push(['Ore dict', x.o.map(esc).join('<br>')]);
+  if (x.f) kv.push(['Fluid', (x.g ? 'gas' : 'liquid') + (x.T ? ` · ${x.T} K` : '')]);
+  kv.push(['ID', esc(x.k)]);
+  return `<aside class="focus" id="focus">
+    <div class="head">${iconHTML(n, 64)}<div><h3>${esc(x.n)}</h3>${x.fo ? `<div class="formula">${esc(x.fo)}</div>` : ''}</div></div>
+    ${x.p ? `<div class="chips"><span class="chip">${esc(x.p)}</span></div>` : ''}
+    <div class="counts"><div><b>${prod[n].length.toLocaleString()}</b><span>ways to make</span></div><div><b>${use[n].length.toLocaleString()}</b><span>uses</span></div></div>
+    ${sibs.length > 1 ? `<div class="sibs">${sibs.map(s => `<button class="sib${s === n ? ' cur' : ''}" data-n="${s}">${iconHTML(s, 20)}${esc(N[s].p.replace('dust', '') || 'Dust')}</button>`).join('')}</div>` : ''}
+    <dl class="kv">${kv.map(([k, v]) => `<dt>${k}</dt><dd>${v}</dd>`).join('')}</dl>
+  </aside>`;
+}
+function laneHTML(side, n) {
+  const { arr, hidRec, hidDup } = groups(side === 'src' ? prod[n] : use[n], side, n);
+  const notes = [];
+  if (hidRec) notes.push(`${hidRec.toLocaleString()} recycling recipes hidden <button data-opt="recycle">show</button>`);
+  if (hidDup) notes.push(`${hidDup.toLocaleString()} multiblock duplicates merged <button data-opt="dup">show</button>`);
+  const title = side === 'src' ? 'Made by' : 'Processed into · used in';
+  return `<div class="lane ${side === 'src' ? 'left' : 'right'}" id="lane-${side}"><h2><span>${title}</span><span>${arr.length} machines</span></h2>
+    ${arr.length ? arr.map(([m, l]) => groupHTML(m, l, side, n)).join('') : `<div class="empty">${side === 'src' ? 'No recipe produces this item.' : 'Nothing consumes this item.'}</div>`}
+    ${notes.length ? `<div class="hiddennote">${notes.join('<br>')}</div>` : ''}</div>`;
+}
+function render() {
+  const n = history[cur];
+  document.title = N[n].n + ' · GTNH Dust Atlas';
+  $('#board').innerHTML = `<svg class="wires" id="wires" aria-hidden="true"></svg>${laneHTML('src', n)}${focusHTML(n)}${laneHTML('use', n)}`;
+  renderTrail();
+  requestAnimationFrame(drawWires);
+}
+
+// ---------- wires ----------
+function drawWires() {
+  const svg = $('#wires'), f = $('#focus'); if (!svg || !f || getComputedStyle(svg).display === 'none') return;
+  const b = $('#board').getBoundingClientRect(), fr = f.getBoundingClientRect();
+  const fy = Math.min(fr.top + 60, fr.bottom - 20) - b.top;
+  let d = '';
+  document.querySelectorAll('.grp').forEach(g => {
+    const h = g.querySelector('header').getBoundingClientRect(), y = h.top + h.height / 2 - b.top;
+    const left = g.closest('.left');
+    const x1 = left ? h.right - b.left : h.left - b.left, x0 = left ? fr.left - b.left : fr.right - b.left;
+    const mx = (x0 + x1) / 2;
+    d += `<path data-g="${g.dataset.g}" d="M${x0},${fy} C${mx},${fy} ${mx},${y} ${x1},${y}"/>`;
+  });
+  svg.innerHTML = d;
+}
+window.addEventListener('resize', () => requestAnimationFrame(drawWires));
+window.addEventListener('scroll', () => requestAnimationFrame(drawWires), { passive: true });
+
+// ---------- interactions ----------
+$('#board').addEventListener('click', e => {
+  const st = e.target.closest('.st, .sib'); if (st) { hideTT(); go(+st.dataset.n); return; }
+  const more = e.target.closest('[data-more]');
+  if (more) { const k = more.dataset.more; expanded[k] = (expanded[k] || PAGE) < 50 ? 50 + (expanded[k] || PAGE) : (expanded[k] + 200); render(); return; }
+  const o = e.target.closest('[data-opt]');
+  if (o) { const k = o.dataset.opt; opt[k] = false; $('#opt' + k[0].toUpperCase() + k.slice(1)).checked = false; store.set('da.' + k, false); render(); return; }
+  const h = e.target.closest('.grp > header');
+  if (h) { const g = h.parentElement, k = g.dataset.g; open[k] = g.classList.contains('closed'); g.classList.toggle('closed'); h.setAttribute('aria-expanded', open[k]); requestAnimationFrame(drawWires); }
+});
+$('#board').addEventListener('keydown', e => {
+  if (e.key !== 'Enter' && e.key !== ' ') return;
+  const t = e.target.closest('.st, .grp > header'); if (!t) return; e.preventDefault(); t.click();
+});
+$('#board').addEventListener('mouseover', e => {
+  const g = e.target.closest('.grp');
+  document.querySelectorAll('.wires path.hot, .grp.hot').forEach(x => x.classList.remove('hot'));
+  if (g) { g.classList.add('hot'); const p = document.querySelector(`.wires path[data-g="${g.dataset.g}"]`); if (p) { p.classList.add('hot'); p.parentNode.appendChild(p); } }
+});
+['optDust', 'optRecycle', 'optDup'].forEach(id => $('#' + id).addEventListener('change', e => {
+  const k = id.slice(3).toLowerCase(); opt[k] = e.target.checked; store.set('da.' + k, opt[k]);
+  if (k === 'dust') doSearch(); else render();
+}));
+
+// ---------- tooltip ----------
+const tt = $('#tt');
+const MC = { 0: '#000', 1: '#00a', 2: '#0a0', 3: '#0aa', 4: '#a00', 5: '#a0a', 6: '#fa0', 7: '#aaa', 8: '#555', 9: '#55f',
+  a: '#5f5', b: '#5ff', c: '#f55', d: '#f5f', e: '#ff5', f: '#fff' };
+function mcText(s) { // render §-formatting codes
+  let out = '', col = null, bold = false, ital = false;
+  const parts = String(s).split(/§(.)/);
+  for (let i = 0; i < parts.length; i++) {
+    if (i % 2) { const c = parts[i].toLowerCase(); if (MC[c]) { col = MC[c]; bold = ital = false; } else if (c === 'l') bold = true; else if (c === 'o') ital = true; else if (c === 'r') { col = null; bold = ital = false; } continue; }
+    if (!parts[i]) continue;
+    out += `<span style="${col ? 'color:' + col + ';' : ''}${bold ? 'font-weight:700;' : ''}${ital ? 'font-style:italic;' : ''}">${esc(parts[i])}</span>`;
+  }
+  return out;
+}
+function showTT(el, ev) {
+  const n = +el.dataset.n, x = N[n], q = +el.dataset.q, c = el.dataset.c, ore = el.dataset.o;
+  let h = `<div class="t1">${esc(x.n)}</div>`;
+  if (x.fo) h += `<div class="y">${esc(x.fo)}</div>`;
+  if (x.f) h += `<div class="g">${q.toLocaleString()} mB${x.g ? ' · gas' : ''}${x.T ? ` · ${x.T} K` : ''}</div>`;
+  else if (q === 0) h += `<div class="g">Not consumed</div>`;
+  else if (q > 1) h += `<div class="g">×${q}</div>`;
+  if (c) h += `<div class="y">${+(c / 100).toFixed(2)}% chance</div>`;
+  if (ore) h += `<div class="g">Any <span style="color:#5ff">${esc(ore)}</span></div>`;
+  (x.t || []).forEach(t => h += `<div class="g">${mcText(t)}</div>`);
+  h += `<div class="d">${esc(x.k)}</div><div style="color:#55f;font-style:italic;font-size:12px">click to open</div>`;
+  tt.innerHTML = h; tt.hidden = false; moveTT(ev);
+}
+function moveTT(ev) {
+  const w = tt.offsetWidth, hh = tt.offsetHeight;
+  let x = ev.clientX + 14, y = ev.clientY - 10;
+  if (x + w > innerWidth - 8) x = ev.clientX - w - 14;
+  if (y + hh > innerHeight - 8) y = innerHeight - hh - 8;
+  tt.style.left = Math.max(8, x) + 'px'; tt.style.top = Math.max(8, y) + 'px';
+}
+function hideTT() { tt.hidden = true; }
+document.addEventListener('mouseover', e => { const st = e.target.closest('.st, .res, .crumb, .sib'); if (st && st.dataset.n) showTT(st, e); else if (!e.target.closest('.st')) hideTT(); });
+document.addEventListener('mousemove', e => { if (!tt.hidden) moveTT(e); });
+document.addEventListener('focusin', e => { const st = e.target.closest('.st'); if (st) { const r = st.getBoundingClientRect(); showTT(st, { clientX: r.right, clientY: r.top }); } });
+document.addEventListener('focusout', hideTT);
+
+// ---------- search ----------
+const q = $('#q'), res = $('#results'); let hits = [], sel = 0;
+function doSearch() {
+  const s = q.value.trim().toLowerCase();
+  if (!s || !searchIdx) { res.hidden = true; q.setAttribute('aria-expanded', 'false'); return; }
+  const words = s.split(/\s+/);
+  const exactFormula = searchIdx.filter(x => (N[x.i].fo || '').toLowerCase() === s);
+  hits = [];
+  for (const x of searchIdx) {
+    if (opt.dust && !x.dust) continue;
+    if (words.every(w => x.s.includes(w))) hits.push(x);
+  }
+  const nm = i => N[i].n.toLowerCase();
+  const pr = { dust: 0, dustSmall: 1, dustTiny: 2, dustImpure: 3, dustPure: 4 };
+  hits.sort((a, b) => (nm(a.i).startsWith(s) ? 0 : 1) - (nm(b.i).startsWith(s) ? 0 : 1) || (pr[N[a.i].p] ?? 5) - (pr[N[b.i].p] ?? 5) || nm(a.i).length - nm(b.i).length);
+  exactFormula.reverse().forEach(x => { if (!opt.dust || x.dust) { hits = hits.filter(h => h.i !== x.i); hits.unshift(x); } });
+  hits = hits.slice(0, 60); sel = 0;
+  res.innerHTML = hits.length ? hits.map((x, k) => { const n = N[x.i];
+    return `<div class="res" role="option" id="r${k}" data-n="${x.i}" aria-selected="${k === 0}">${iconHTML(x.i, 20)}<span class="nm">${esc(n.n)}</span><span class="tag">${esc(n.fo || n.p || (n.f ? 'fluid' : ''))}</span></div>`; }).join('')
+    : `<div class="empty" style="padding:8px">No ${opt.dust ? 'dusts' : 'items'} match “${esc(q.value)}”.${opt.dust ? ' Untick “Dusts only” to search every item.' : ''}</div>`;
+  res.hidden = false; q.setAttribute('aria-expanded', 'true');
+}
+function pick(i) { res.hidden = true; q.setAttribute('aria-expanded', 'false'); q.blur(); hideTT(); go(i); }
+q.addEventListener('input', doSearch);
+q.addEventListener('focus', () => { if (q.value) doSearch(); });
+q.addEventListener('keydown', e => {
+  if (res.hidden || !hits.length) return;
+  if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
+    e.preventDefault(); sel = (sel + (e.key === 'ArrowDown' ? 1 : -1) + hits.length) % hits.length;
+    res.querySelectorAll('.res').forEach((r, k) => r.setAttribute('aria-selected', k === sel));
+    $('#r' + sel).scrollIntoView({ block: 'nearest' }); q.setAttribute('aria-activedescendant', 'r' + sel);
+  } else if (e.key === 'Enter') { e.preventDefault(); pick(hits[sel].i); }
+  else if (e.key === 'Escape') { res.hidden = true; }
+});
+res.addEventListener('mousedown', e => { const r = e.target.closest('.res'); if (r) { e.preventDefault(); pick(+r.dataset.n); } });
+document.addEventListener('click', e => { if (!e.target.closest('.search')) res.hidden = true; });
+document.addEventListener('keydown', e => { if (e.key === '/' && document.activeElement !== q) { e.preventDefault(); q.focus(); q.select(); } });
+})();
+</script>
+</body>
+</html>
