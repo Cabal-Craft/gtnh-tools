@@ -6,6 +6,7 @@
 <title>GTNH Dust Atlas</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600&family=JetBrains+Mono:wght@400;600&family=Pixelify+Sans:wght@500;700&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+Symbols&family=Noto+Sans+Symbols+2&display=swap">
 <style>
 /* Layout: a three-lane flowchart board. Sources (made by) feed in from the left, the focused item sits in the middle,
    processing and uses fan out to the right. Wires connect the item to each machine group. */
@@ -29,8 +30,8 @@
   --tt-dark: #555555;
   --tt-yellow: #ffff55;
   --f-display: "Pixelify Sans", "Courier New", monospace;
-  --f-body: "Barlow", "Segoe UI", system-ui, sans-serif;
-  --f-data: "JetBrains Mono", ui-monospace, Consolas, monospace;
+  --f-body: "Barlow", "Segoe UI", system-ui, "Segoe UI Symbol", "Noto Sans Symbols", "Noto Sans Symbols 2", sans-serif;
+  --f-data: "JetBrains Mono", ui-monospace, Consolas, "Segoe UI Symbol", "Noto Sans Symbols", "Noto Sans Symbols 2", monospace;
 }
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
@@ -244,6 +245,7 @@ button, input { font: inherit; color: inherit; }
 .dcard:hover { border-color: var(--accent); }
 .dcard .tx { min-width: 0; display: flex; flex-direction: column; }
 .dcard .nm { font-weight: 500; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+sub.sq { font-size: .72em; vertical-align: -.25em; line-height: 0; }
 .dcard .fo { font: 11px var(--f-data); color: var(--accent); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .dcard .ct { font: 11px var(--f-data); color: var(--muted); font-variant-numeric: tabular-nums; }
 
@@ -305,6 +307,8 @@ button, input { font: inherit; color: inherit; }
 'use strict';
 const $ = (s, el = document) => el.querySelector(s);
 const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+// GT's subscript-question-mark glyph (U+E020) has no Unicode equivalent: draw it as a real subscript
+const fx = s => esc(s).replace(//g, '<sub class="sq">?</sub>');
 const store = { get(k, d) { try { const v = localStorage.getItem(k); return v == null ? d : JSON.parse(v); } catch { return d; } },
                 set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch {} } };
 
@@ -481,7 +485,7 @@ function focusHTML(n) {
   if (x.f) kv.push(['Fluid', (x.g ? 'gas' : 'liquid') + (x.T ? ` · ${x.T} K` : '')]);
   kv.push(['ID', esc(x.k)]);
   return `<aside class="focus" id="focus">
-    <div class="head">${iconHTML(n, 64)}<div><h3>${esc(x.n)}</h3>${x.fo ? `<div class="formula">${esc(x.fo)}</div>` : ''}</div></div>
+    <div class="head">${iconHTML(n, 64)}<div><h3>${esc(x.n)}</h3>${x.fo ? `<div class="formula">${fx(x.fo)}</div>` : ''}</div></div>
     ${x.p ? `<div class="chips"><span class="chip">${esc(x.p)}</span></div>` : ''}
     <div class="counts"><div><b>${prod[n].length.toLocaleString()}</b><span>ways to make</span></div><div><b>${use[n].length.toLocaleString()}</b><span>uses</span></div></div>
     ${sibs.length > 1 ? `<div class="sibs">${sibs.map(s => `<button class="sib${s === n ? ' cur' : ''}" data-n="${s}">${iconHTML(s, 20)}${esc(N[s].p.replace('dust', '') || 'Dust')}</button>`).join('')}</div>` : ''}
@@ -613,7 +617,7 @@ function renderDustList() {
   else l.sort((a, b) => nm(a).localeCompare(nm(b)));
   $('#dcount').textContent = `${l.length.toLocaleString()} shown`;
   const card = i => { const x = N[i];
-    return `<button class="dcard" data-n="${i}">${iconHTML(i)}<span class="tx"><span class="nm">${esc(x.n)}</span>${x.fo ? `<span class="fo">${esc(x.fo)}</span>` : ''}<span class="ct">${prod[i].length.toLocaleString()} make · ${use[i].length.toLocaleString()} uses</span></span></button>`; };
+    return `<button class="dcard" data-n="${i}">${iconHTML(i)}<span class="tx"><span class="nm">${esc(x.n)}</span>${x.fo ? `<span class="fo">${fx(x.fo)}</span>` : ''}<span class="ct">${prod[i].length.toLocaleString()} make · ${use[i].length.toLocaleString()} uses</span></span></button>`; };
   if (!l.length) { $('#dlist').innerHTML = `<div class="empty">No dusts match “${esc(dustState.q)}”.</div>`; $('#dletters').innerHTML = ''; return; }
   if (dustState.sort !== 'name') { $('#dletters').innerHTML = ''; $('#dlist').innerHTML = `<div class="dgrid">${l.map(card).join('')}</div>`; return; }
   const by = new Map();
@@ -738,14 +742,14 @@ function mcText(s) { // render §-formatting codes
   for (let i = 0; i < parts.length; i++) {
     if (i % 2) { const c = parts[i].toLowerCase(); if (MC[c]) { col = MC[c]; bold = ital = false; } else if (c === 'l') bold = true; else if (c === 'o') ital = true; else if (c === 'r') { col = null; bold = ital = false; } continue; }
     if (!parts[i]) continue;
-    out += `<span style="${col ? 'color:' + col + ';' : ''}${bold ? 'font-weight:700;' : ''}${ital ? 'font-style:italic;' : ''}">${esc(parts[i])}</span>`;
+    out += `<span style="${col ? 'color:' + col + ';' : ''}${bold ? 'font-weight:700;' : ''}${ital ? 'font-style:italic;' : ''}">${fx(parts[i])}</span>`;
   }
   return out;
 }
 function showTT(el, ev) {
   const n = +el.dataset.n, x = N[n], q = +el.dataset.q, c = el.dataset.c, ore = el.dataset.o;
   let h = `<div class="t1">${esc(x.n)}</div>`;
-  if (x.fo) h += `<div class="y">${esc(x.fo)}</div>`;
+  if (x.fo) h += `<div class="y">${fx(x.fo)}</div>`;
   if (x.f) h += `<div class="g">${q.toLocaleString()} mB${x.g ? ' · gas' : ''}${x.T ? ` · ${x.T} K` : ''}</div>`;
   else if (q === 0) h += `<div class="g">Not consumed</div>`;
   else if (q > 1) h += `<div class="g">×${q}</div>`;
@@ -786,7 +790,7 @@ function doSearch() {
   exactFormula.reverse().forEach(x => { if (!opt.dust || x.dust) { hits = hits.filter(h => h.i !== x.i); hits.unshift(x); } });
   hits = hits.slice(0, 60); sel = 0;
   res.innerHTML = hits.length ? hits.map((x, k) => { const n = N[x.i];
-    return `<div class="res" role="option" id="r${k}" data-n="${x.i}" aria-selected="${k === 0}">${iconHTML(x.i, 20)}<span class="nm">${esc(n.n)}</span><span class="tag">${esc(n.fo || n.p || (n.f ? 'fluid' : ''))}</span></div>`; }).join('')
+    return `<div class="res" role="option" id="r${k}" data-n="${x.i}" aria-selected="${k === 0}">${iconHTML(x.i, 20)}<span class="nm">${esc(n.n)}</span><span class="tag">${fx(n.fo || n.p || (n.f ? 'fluid' : ''))}</span></div>`; }).join('')
     : `<div class="empty" style="padding:8px">No ${opt.dust ? 'dusts' : 'items'} match “${esc(q.value)}”.${opt.dust ? ' Untick “Dusts only” to search every item.' : ''}</div>`;
   res.hidden = false; q.setAttribute('aria-expanded', 'true');
 }

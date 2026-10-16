@@ -14,7 +14,25 @@ fluids = {f['k']: f for f in I['fluids']}
 order = [l.strip() for l in open(os.path.join(D, 'icons_wanted.txt'), encoding='utf-8') if l.strip()]
 idx = {k: n for n, k in enumerate(order)}
 
-PREFIX_FROM_ORE = re.compile(r'^(dustTiny|dustSmall|dustImpure|dustPure|dustRefined|dust)[A-Z]')
+# GT draws formulas with private-use glyphs from its own font page (gregtech.api.util.CustomGlyphs).
+# Translate them to real Unicode so browsers can render them. U+E020 (subscript "?") has no Unicode
+# equivalent; it is kept and drawn as <sub>?</sub> by the page.
+GLYPHS = {
+    '': '\U0001F701', '': '\U0001F703', '': '\U0001F702', '': '\U0001F704',  # air earth fire water
+    '': '⋀', '': '⋁', '': '⊛', '': '⛏', '': '⇲',
+    '': '⇱', '': '⚡', '': '✱', '': '\U0001F300', '': '✧',
+    '': '\U0001F9F2', '': '∅', '': '₀', '': 'ℵ', '': 'ω',
+    '': '「', '': '\U0001F70D', '': '⨂',
+    **{chr(0xe010 + d): '⁰¹²³⁴⁵⁶⁷⁸⁹'[d] for d in range(10)},
+}
+GLYPH_TABLE = str.maketrans(GLYPHS)
+
+
+def fix(s):
+    return s.translate(GLYPH_TABLE) if isinstance(s, str) else s
+
+
+PREFIX_FROM_ORE =re.compile(r'^(dustTiny|dustSmall|dustImpure|dustPure|dustRefined|dust)[A-Z]')
 
 
 def prefix_of(i):
@@ -30,17 +48,17 @@ nodes = []
 for k in order:
     if k.startswith('fluid:'):
         f = fluids.get(k[6:], {'name': k[6:]})
-        nodes.append({'k': k, 'n': f['name'], 'f': 1, **({'g': 1} if f.get('gas') else {}),
+        nodes.append({'k': k, 'n': fix(f['name']), 'f': 1, **({'g': 1} if f.get('gas') else {}),
                       **({'T': f['temp']} if f.get('temp') else {})})
         continue
     i = items.get(k, {'name': k})
-    rec = {'k': k, 'n': i['name']}
+    rec = {'k': k, 'n': fix(i['name'])}
     p = prefix_of(i)
     if p: rec['p'] = p
-    if i.get('formula') and i['formula'] != '?': rec['fo'] = i['formula']
+    if i.get('formula') and i['formula'] != '?': rec['fo'] = fix(i['formula'])
     if i.get('mat'): rec['m'] = i['mat']
     if i.get('ore'): rec['o'] = i['ore'][:6]
-    tip = [t for t in i.get('tip', []) if t and t != i.get('formula')][:8]
+    tip = [fix(t) for t in i.get('tip', []) if t and t != i.get('formula')][:8]
     if tip: rec['t'] = tip
     nodes.append(rec)
 
