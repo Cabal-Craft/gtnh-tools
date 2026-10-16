@@ -198,6 +198,76 @@ button, input { font: inherit; color: inherit; }
 .tt .d { color: var(--tt-dark); font-family: var(--f-data); font-size: 11px; }
 .loading { padding: 60px 0; text-align: center; color: var(--muted); font: 14px var(--f-data); }
 
+/* ---------- view tabs ---------- */
+.views { display: flex; gap: 2px; background: var(--panel-2); border-radius: 7px; padding: 3px; }
+.views a {
+  padding: 5px 12px; border-radius: 5px; color: var(--muted); text-decoration: none; font-size: 14px; font-weight: 500;
+  white-space: nowrap;
+}
+.views a[aria-current="page"] { background: var(--panel); color: var(--fg); box-shadow: 0 1px 2px rgba(0,0,0,.12); }
+.views a:hover { color: var(--fg); }
+
+/* ---------- machine filter bar (flowchart) ---------- */
+.mfilter { display: flex; flex-wrap: wrap; align-items: center; gap: 5px; padding-block: 10px 0; }
+.mfilter .lbl { font: 600 11px var(--f-data); letter-spacing: .1em; text-transform: uppercase; color: var(--muted); margin-right: 4px; }
+.mchip {
+  display: inline-flex; align-items: center; gap: 6px; padding: 3px 9px; border-radius: 999px; font-size: 12.5px;
+  border: 1px solid var(--line); background: var(--panel); cursor: pointer;
+}
+.mchip .n { font: 11px var(--f-data); color: var(--muted); }
+.mchip[aria-pressed="false"] { background: transparent; color: var(--muted); text-decoration: line-through; border-style: dashed; }
+.linkbtn { background: none; border: 0; padding: 3px 6px; color: var(--accent); cursor: pointer; font-size: 12.5px; }
+
+/* ---------- list pages ---------- */
+.page { padding-block: 18px; display: flex; flex-direction: column; gap: 16px; }
+.page > h2 { margin: 0; font: 700 24px/1.1 var(--f-display); text-wrap: balance; }
+.page .sub { margin: -8px 0 0; color: var(--muted); font-size: 14px; max-width: 70ch; }
+.controls { display: flex; flex-wrap: wrap; gap: 10px 14px; align-items: center; }
+.controls input[type="search"], .controls select {
+  padding: 7px 10px; border: 1px solid var(--line); border-radius: 6px; background: var(--panel); min-width: 0;
+}
+.controls input[type="search"] { flex: 1 1 260px; max-width: 420px; }
+.seg { display: inline-flex; border: 1px solid var(--line); border-radius: 6px; overflow: hidden; flex-wrap: wrap; }
+.seg button { border: 0; background: var(--panel); padding: 6px 11px; font-size: 13px; cursor: pointer; color: var(--muted); }
+.seg button + button { border-left: 1px solid var(--line); }
+.seg button[aria-pressed="true"] { background: var(--fg); color: var(--bg); }
+.count { font: 12px var(--f-data); color: var(--muted); font-variant-numeric: tabular-nums; }
+.letters { display: flex; flex-wrap: wrap; gap: 2px; }
+.letters a { font: 600 12px var(--f-data); padding: 3px 6px; border-radius: 4px; color: var(--accent); text-decoration: none; }
+.letters a:hover { background: var(--panel-2); }
+.letter-h { font: 700 18px var(--f-display); margin: 8px 0 0; padding-bottom: 4px; border-bottom: 1px solid var(--line); scroll-margin-top: 160px; }
+.dgrid { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(230px, 100%), 1fr)); gap: 6px; }
+.dcard {
+  display: flex; align-items: center; gap: 10px; padding: 6px 10px 6px 6px; border: 1px solid var(--line); border-radius: 6px;
+  background: var(--panel); cursor: pointer; text-align: left; min-width: 0;
+}
+.dcard:hover { border-color: var(--accent); }
+.dcard .tx { min-width: 0; display: flex; flex-direction: column; }
+.dcard .nm { font-weight: 500; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.dcard .fo { font: 11px var(--f-data); color: var(--accent); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.dcard .ct { font: 11px var(--f-data); color: var(--muted); font-variant-numeric: tabular-nums; }
+
+/* machine index */
+.cat { display: flex; flex-direction: column; gap: 8px; }
+.cat h3 { margin: 0; font: 600 12px var(--f-data); letter-spacing: .1em; text-transform: uppercase; color: var(--muted); }
+.mgrid { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(250px, 100%), 1fr)); gap: 8px; }
+.mcard {
+  display: flex; flex-direction: column; gap: 6px; padding: 10px 12px; border: 1px solid var(--line); border-radius: 8px;
+  background: var(--panel); color: inherit; text-decoration: none;
+}
+.mcard:hover { border-color: var(--accent); }
+.mcard b { font-weight: 600; }
+.mcard .row { display: flex; gap: 3px; min-height: 20px; }
+.mtabs { display: flex; flex-wrap: wrap; gap: 6px; }
+.mtabs a { padding: 4px 10px; border: 1px solid var(--line); border-radius: 999px; font-size: 13px; color: inherit; text-decoration: none; background: var(--panel); }
+.mtabs a[aria-current="page"] { border-color: var(--fg); background: var(--fg); color: var(--bg); }
+.mtabs a .n { font: 11px var(--f-data); opacity: .7; margin-left: 4px; }
+.rgrid { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(340px, 100%), 1fr)); gap: 8px; align-items: start; }
+.rgrid .rec { border: 1px solid var(--line); border-radius: 8px; background: var(--panel); }
+.rgrid .rec:first-child { border-top: 1px solid var(--line); }
+.crumbs { font-size: 13px; color: var(--muted); }
+.crumbs a { color: var(--accent); text-decoration: none; }
+
 @media (max-width: 980px) {
   .board { grid-template-columns: minmax(0, 1fr); gap: 22px; }
   .wires { display: none; }
@@ -210,6 +280,9 @@ button, input { font: inherit; color: inherit; }
 <body>
 <header class="top">
   <div class="brand"><h1>Dust Atlas</h1><small id="ver">GTNH 2.9.0-RC1</small></div>
+  <nav class="views" aria-label="Views">
+    <a href="#flow" data-v="flow">Flowchart</a><a href="#dusts" data-v="dusts">All dusts</a><a href="#machines" data-v="machines">Machines</a>
+  </nav>
   <div class="search">
     <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M10 2a8 8 0 0 1 6.32 12.9l5.39 5.4-1.41 1.4-5.4-5.39A8 8 0 1 1 10 2zm0 2a6 6 0 1 0 0 12 6 6 0 0 0 0-12z"/></svg>
     <input id="q" type="search" placeholder="Search dusts: bauxite, Fe, tiny iron, pyrite…" autocomplete="off" aria-label="Search items" role="combobox" aria-expanded="false" aria-controls="results">
@@ -221,8 +294,10 @@ button, input { font: inherit; color: inherit; }
     <label><input type="checkbox" id="optDup" checked> Merge multiblock duplicates</label>
   </div>
 </header>
-<nav class="trail" id="trail" aria-label="History"></nav>
+<nav class="trail" id="trail" aria-label="Recently viewed"></nav>
+<div class="mfilter" id="mfilter" hidden></div>
 <main class="board" id="board"><div class="loading" id="loading">Loading 60,435 recipes…</div></main>
+<main class="page" id="page" hidden></main>
 <div class="tt" id="tt" hidden></div>
 
 <script>
@@ -253,8 +328,11 @@ const DUP_OF = { 'gt.recipe.multicentrifuge': 'gt.recipe.centrifuge', 'gt.recipe
 const RECYCLERS = new Set(['gt.recipe.macerator', 'gt.recipe.arcfurnace', 'gt.recipe.fluidextractor', 'gt.recipe.pulveriser']);
 const PAGE = 6;
 
-let D, N, M, prod, use, dupHidden, searchIdx, atlasOk = false;
-let history = [], cur = -1, expanded = {}, open = {};
+const TRAIL_MAX = 20;
+let D, N, M, prod, use, dupHidden, searchIdx, byMachine, atlasOk = false;
+let trail = store.get('da.trail', []), focusN = -1, view = '', expanded = {}, open = {};
+const hideM = new Set(store.get('da.hideM', []));
+const isDust = n => !!(N[n].p && N[n].p.startsWith('dust'));
 const opt = { dust: store.get('da.dust', true), recycle: store.get('da.recycle', true), dup: store.get('da.dup', true) };
 $('#optDust').checked = opt.dust; $('#optRecycle').checked = opt.recycle; $('#optDup').checked = opt.dup;
 
@@ -279,42 +357,65 @@ Promise.all([fetch('data.json').then(r => r.json()),
   const base = {};
   D.recipes.forEach(r => { const id = M[r[0]][0]; if (Object.values(DUP_OF).includes(id)) (base[id] ||= new Set()).add(sig(r)); });
   dupHidden = new Uint8Array(D.recipes.length);
+  byMachine = M.map(() => []);
   D.recipes.forEach((r, ri) => {
     const b = DUP_OF[M[r[0]][0]];
     if (b && base[b] && base[b].has(sig(r))) dupHidden[ri] = 1;
+    byMachine[r[0]].push(ri);
     new Set(r[2].map(s => s[0])).forEach(n => prod[n].push(ri));
     new Set(r[1].map(s => s[0])).forEach(n => use[n].push(ri));
   });
   searchIdx = N.map((n, i) => ({ i, s: (n.n + ' ' + (n.fo || '') + ' ' + (n.m || '')).toLowerCase(),
     dust: !!(n.p && n.p.startsWith('dust')) }));
-  const start = parseInt((location.hash.match(/^#n(\d+)$/) || [])[1]);
-  const def = N.findIndex(n => n.n === 'Bauxite Dust');
-  go(Number.isInteger(start) && N[start] ? start : (store.get('da.last', def) ?? def), true);
+  trail = trail.filter(i => N[i]).slice(-TRAIL_MAX);
+  route();
+  window.addEventListener('hashchange', route);
 }).catch(e => { $('#loading').textContent = 'Could not load data.json: ' + e.message; });
 
 // ---------- navigation ----------
-function go(i, replace) {
-  if (i < 0 || !N[i]) return;
-  if (!replace && history[cur] !== i) { history = history.slice(0, cur + 1); history.push(i); cur = history.length - 1; }
-  else if (replace) { history = [i]; cur = 0; }
-  if (history.length > 24) { history.shift(); cur--; }
-  expanded = {}; open = {};
-  store.set('da.last', i);
-  if (location.hash !== '#n' + i) history_replace('#n' + i);
-  render();
-  window.scrollTo({ top: 0 });
+// #n<node> flowchart · #dusts all dusts · #machines machine types · #m<machine> one machine's recipes
+function route() {
+  const h = location.hash; let m;
+  hideTT();
+  if ((m = h.match(/^#n(\d+)$/)) && N[+m[1]]) return showFlow(+m[1]);
+  if (h === '#dusts') return showDusts();
+  if (h === '#machines') return showMachines();
+  if ((m = h.match(/^#m(\d+)$/)) && M[+m[1]]) return showMachine(+m[1]);
+  const def = N.findIndex(n => n.n === 'Bauxite Dust');
+  let last = store.get('da.last', def); if (!N[last]) last = def;
+  try { history.replaceState(null, '', '#n' + last); } catch {}
+  showFlow(last);
 }
-function history_replace(h) { try { window.history.replaceState(null, '', h); } catch { location.hash = h; } }
-window.addEventListener('hashchange', () => { const m = location.hash.match(/^#n(\d+)$/); if (m && +m[1] !== history[cur]) go(+m[1]); });
+function go(i) { if (!N[i]) return; hideTT(); if (location.hash === '#n' + i) route(); else location.hash = '#n' + i; }
+function setView(v, title) {
+  const changed = view !== v; view = v;
+  $('#board').hidden = v !== 'flow'; $('#page').hidden = v === 'flow'; $('#mfilter').hidden = v !== 'flow';
+  const tab = v === 'machine' ? 'machines' : v;
+  document.querySelectorAll('.views a').forEach(a => {
+    if (a.dataset.v === tab) a.setAttribute('aria-current', 'page'); else a.removeAttribute('aria-current');
+  });
+  document.title = title ? title + ' · GTNH Dust Atlas' : 'GTNH Dust Atlas';
+  renderTrail();
+  return changed;
+}
+function showFlow(i) {
+  const moved = focusN !== i;
+  if (moved) { expanded = {}; open = {}; }
+  focusN = i;
+  // recently viewed: newest at the end, capped at TRAIL_MAX, oldest dropped first
+  if (!trail.includes(i)) { trail.push(i); while (trail.length > TRAIL_MAX) trail.shift(); store.set('da.trail', trail); }
+  store.set('da.last', i);
+  const changed = setView('flow', N[i].n);
+  render();
+  if (moved || changed) window.scrollTo({ top: 0 });
+}
 
 function renderTrail() {
-  $('#trail').innerHTML = history.map((n, k) =>
-    `<button class="crumb${k === cur ? ' cur' : ''}" data-h="${k}">${iconHTML(n, 20)}<span>${esc(N[n].n)}</span></button>`).join('');
+  $('#trail').innerHTML = trail.map(n =>
+    `<button class="crumb${view === 'flow' && n === focusN ? ' cur' : ''}" data-n="${n}">${iconHTML(n, 20)}<span>${esc(N[n].n)}</span></button>`).join('')
+    + (trail.length ? `<span class="count" style="align-self:center;margin-left:4px">${trail.length}/${TRAIL_MAX}</span>` : '');
 }
-$('#trail').addEventListener('click', e => {
-  const b = e.target.closest('.crumb'); if (!b) return;
-  cur = +b.dataset.h; expanded = {}; open = {}; history_replace('#n' + history[cur]); render();
-});
+$('#trail').addEventListener('click', e => { const b = e.target.closest('.crumb'); if (b) go(+b.dataset.n); });
 
 // ---------- rendering ----------
 const isRecycling = (ri, focus) => {
@@ -339,7 +440,8 @@ function groups(list, side, focus) {
 function stackHTML(s, focus) {
   const [n, q, ch, ore] = s, node = N[n];
   const qs = node.f ? (q >= 1000 ? (q / 1000) + 'B' : q + 'mB') : (q > 1 ? q : q === 0 ? 'NC' : '');
-  return `<span class="st${n === focus ? ' me' : ''}${node.f ? ' fl' : ''}" data-n="${n}" data-q="${q}"${ch != null && ch !== 10000 ? ` data-c="${ch}"` : ''}${ore ? ` data-o="${esc(ore)}"` : ''} tabindex="0">${iconHTML(n)}${qs !== '' ? `<b class="q">${qs}</b>` : ''}${ch != null && ch !== 10000 ? `<b class="c">${+(ch / 100).toFixed(2)}%</b>` : ''}</span>`;
+  const me = focus instanceof Set ? focus.has(n) : n === focus;
+  return `<span class="st${me ? ' me' : ''}${node.f ? ' fl' : ''}" data-n="${n}" data-q="${q}"${ch != null && ch !== 10000 ? ` data-c="${ch}"` : ''}${ore ? ` data-o="${esc(ore)}"` : ''} tabindex="0">${iconHTML(n)}${qs !== '' ? `<b class="q">${qs}</b>` : ''}${ch != null && ch !== 10000 ? `<b class="c">${+(ch / 100).toFixed(2)}%</b>` : ''}</span>`;
 }
 function recipeHTML(ri, focus) {
   const r = D.recipes[ri], mid = M[r[0]][0];
@@ -386,23 +488,44 @@ function focusHTML(n) {
     <dl class="kv">${kv.map(([k, v]) => `<dt>${k}</dt><dd>${v}</dd>`).join('')}</dl>
   </aside>`;
 }
-function laneHTML(side, n) {
-  const { arr, hidRec, hidDup } = groups(side === 'src' ? prod[n] : use[n], side, n);
+function laneHTML(side, n, g) {
+  const { arr, hidRec, hidDup } = g;
+  const vis = arr.filter(([m]) => !hideM.has(M[m][0]));
+  const hidF = arr.length - vis.length;
   const notes = [];
+  if (hidF) notes.push(`${hidF} machine${hidF > 1 ? 's' : ''} hidden by the machine filter <button data-showall>show all</button>`);
   if (hidRec) notes.push(`${hidRec.toLocaleString()} recycling recipes hidden <button data-opt="recycle">show</button>`);
   if (hidDup) notes.push(`${hidDup.toLocaleString()} multiblock duplicates merged <button data-opt="dup">show</button>`);
   const title = side === 'src' ? 'Made by' : 'Processed into · used in';
-  return `<div class="lane ${side === 'src' ? 'left' : 'right'}" id="lane-${side}"><h2><span>${title}</span><span>${arr.length} machines</span></h2>
-    ${arr.length ? arr.map(([m, l]) => groupHTML(m, l, side, n)).join('') : `<div class="empty">${side === 'src' ? 'No recipe produces this item.' : 'Nothing consumes this item.'}</div>`}
+  return `<div class="lane ${side === 'src' ? 'left' : 'right'}" id="lane-${side}"><h2><span>${title}</span><span>${vis.length} machines</span></h2>
+    ${vis.length ? vis.map(([m, l]) => groupHTML(m, l, side, n)).join('') : `<div class="empty">${arr.length ? 'Every machine here is hidden by the filter.' : side === 'src' ? 'No recipe produces this item.' : 'Nothing consumes this item.'}</div>`}
     ${notes.length ? `<div class="hiddennote">${notes.join('<br>')}</div>` : ''}</div>`;
 }
+function mfilterHTML(gs) {
+  const cnt = new Map();
+  gs.forEach(g => g.arr.forEach(([m, l]) => cnt.set(m, (cnt.get(m) || 0) + l.length)));
+  if (!cnt.size) return '';
+  const rank = m => { const p = PRIORITY.indexOf(M[m][0]); return p < 0 ? 100 : p; };
+  const ms = [...cnt.keys()].sort((a, b) => rank(a) - rank(b) || cnt.get(b) - cnt.get(a));
+  return `<span class="lbl">Machines</span>${ms.map(m => `<button class="mchip" data-mid="${esc(M[m][0])}" aria-pressed="${!hideM.has(M[m][0])}">${esc(M[m][1])}<span class="n">${cnt.get(m).toLocaleString()}</span></button>`).join('')}
+    <button class="linkbtn" data-mall="show">Show all</button><button class="linkbtn" data-mall="hide">Hide all</button>`;
+}
 function render() {
-  const n = history[cur];
-  document.title = N[n].n + ' · GTNH Dust Atlas';
-  $('#board').innerHTML = `<svg class="wires" id="wires" aria-hidden="true"></svg>${laneHTML('src', n)}${focusHTML(n)}${laneHTML('use', n)}`;
+  const n = focusN;
+  const gs = groups(prod[n], 'src', n), gu = groups(use[n], 'use', n);
+  $('#mfilter').innerHTML = mfilterHTML([gs, gu]);
+  $('#board').innerHTML = `<svg class="wires" id="wires" aria-hidden="true"></svg>${laneHTML('src', n, gs)}${focusHTML(n)}${laneHTML('use', n, gu)}`;
   renderTrail();
   requestAnimationFrame(drawWires);
 }
+function saveHideM() { store.set('da.hideM', [...hideM]); }
+$('#mfilter').addEventListener('click', e => {
+  const c = e.target.closest('.mchip'), all = e.target.closest('[data-mall]');
+  if (c) { const id = c.dataset.mid; hideM.has(id) ? hideM.delete(id) : hideM.add(id); }
+  else if (all) document.querySelectorAll('#mfilter .mchip').forEach(x => all.dataset.mall === 'show' ? hideM.delete(x.dataset.mid) : hideM.add(x.dataset.mid));
+  else return;
+  saveHideM(); render();
+});
 
 // ---------- wires ----------
 function drawWires() {
@@ -429,6 +552,7 @@ $('#board').addEventListener('click', e => {
   if (more) { const k = more.dataset.more; expanded[k] = (expanded[k] || PAGE) < 50 ? 50 + (expanded[k] || PAGE) : (expanded[k] + 200); render(); return; }
   const o = e.target.closest('[data-opt]');
   if (o) { const k = o.dataset.opt; opt[k] = false; $('#opt' + k[0].toUpperCase() + k.slice(1)).checked = false; store.set('da.' + k, false); render(); return; }
+  if (e.target.closest('[data-showall]')) { hideM.clear(); saveHideM(); render(); return; }
   const h = e.target.closest('.grp > header');
   if (h) { const g = h.parentElement, k = g.dataset.g; open[k] = g.classList.contains('closed'); g.classList.toggle('closed'); h.setAttribute('aria-expanded', open[k]); requestAnimationFrame(drawWires); }
 });
@@ -443,8 +567,166 @@ $('#board').addEventListener('mouseover', e => {
 });
 ['optDust', 'optRecycle', 'optDup'].forEach(id => $('#' + id).addEventListener('change', e => {
   const k = id.slice(3).toLowerCase(); opt[k] = e.target.checked; store.set('da.' + k, opt[k]);
-  if (k === 'dust') doSearch(); else render();
+  if (k === 'dust') doSearch(); else refresh();
 }));
+function refresh() {
+  if (view === 'flow') render(); else if (view === 'dusts') renderDustList(); else if (view === 'machines') showMachines();
+  else if (view === 'machine') renderMachineList();
+}
+
+// ---------- page: all dusts ----------
+const PREFIXES = [['all', 'All'], ['dust', 'Dust'], ['dustSmall', 'Small'], ['dustTiny', 'Tiny'], ['dustImpure', 'Impure'], ['dustPure', 'Pure'], ['other', 'Other']];
+const dustState = { q: '', p: 'dust', sort: 'name' };
+let dustList = null;
+function showDusts() {
+  dustList ||= N.map((_, i) => i).filter(isDust);
+  setView('dusts', 'All dusts');
+  const counts = Object.fromEntries(PREFIXES.map(([p]) => [p, 0]));
+  dustList.forEach(i => { const p = N[i].p; counts.all++; counts[p in counts ? p : 'other']++; });
+  $('#page').innerHTML = `<h2>All dusts</h2>
+    <p class="sub">Every dust in the pack, including small, tiny, impure and pure dusts. Pick one to open its flowchart.</p>
+    <div class="controls">
+      <input type="search" id="dq" placeholder="Filter by name, formula or material" value="${esc(dustState.q)}" aria-label="Filter dusts">
+      <div class="seg" role="group" aria-label="Dust size">${PREFIXES.map(([p, l]) => `<button data-p="${p}" aria-pressed="${dustState.p === p}">${l} <span class="count">${counts[p].toLocaleString()}</span></button>`).join('')}</div>
+      <select id="dsort" aria-label="Sort dusts">
+        <option value="name">Sort: name</option><option value="uses">Sort: most uses</option><option value="makes">Sort: most ways to make</option>
+      </select>
+      <span class="count" id="dcount"></span>
+    </div>
+    <div class="letters" id="dletters"></div>
+    <div id="dlist"></div>`;
+  $('#dsort').value = dustState.sort;
+  renderDustList();
+  window.scrollTo({ top: 0 });
+}
+function renderDustList() {
+  if (view !== 'dusts') return;
+  const words = dustState.q.trim().toLowerCase().split(/\s+/).filter(Boolean);
+  let l = dustList.filter(i => {
+    const p = N[i].p;
+    if (dustState.p !== 'all' && (dustState.p === 'other' ? PREFIXES.some(([x]) => x === p) : p !== dustState.p)) return false;
+    return !words.length || words.every(w => searchIdx[i].s.includes(w));
+  });
+  const nm = i => N[i].n.toLowerCase();
+  if (dustState.sort === 'uses') l.sort((a, b) => use[b].length - use[a].length || nm(a).localeCompare(nm(b)));
+  else if (dustState.sort === 'makes') l.sort((a, b) => prod[b].length - prod[a].length || nm(a).localeCompare(nm(b)));
+  else l.sort((a, b) => nm(a).localeCompare(nm(b)));
+  $('#dcount').textContent = `${l.length.toLocaleString()} shown`;
+  const card = i => { const x = N[i];
+    return `<button class="dcard" data-n="${i}">${iconHTML(i)}<span class="tx"><span class="nm">${esc(x.n)}</span>${x.fo ? `<span class="fo">${esc(x.fo)}</span>` : ''}<span class="ct">${prod[i].length.toLocaleString()} make · ${use[i].length.toLocaleString()} uses</span></span></button>`; };
+  if (!l.length) { $('#dlist').innerHTML = `<div class="empty">No dusts match “${esc(dustState.q)}”.</div>`; $('#dletters').innerHTML = ''; return; }
+  if (dustState.sort !== 'name') { $('#dletters').innerHTML = ''; $('#dlist').innerHTML = `<div class="dgrid">${l.map(card).join('')}</div>`; return; }
+  const by = new Map();
+  l.forEach(i => { const c = /[a-z]/i.test(N[i].n[0]) ? N[i].n[0].toUpperCase() : '#'; if (!by.has(c)) by.set(c, []); by.get(c).push(i); });
+  $('#dletters').innerHTML = [...by.keys()].map(c => `<a href="javascript:void 0" data-letter="${c}">${c}</a>`).join('');
+  $('#dlist').innerHTML = [...by.entries()].map(([c, is]) => `<h3 class="letter-h" id="L-${c === '#' ? 'num' : c}">${c}</h3><div class="dgrid">${is.map(card).join('')}</div>`).join('');
+}
+
+// ---------- page: machine types ----------
+const CATEGORIES = [
+  ['Grinding', /macerator|hammer|oremill|pulveri|crusher|grinder/],
+  ['Separation', /centrifuge|electrolyzer|multielectro|sifter|separator|orewasher|simplewasher|chemicalbath|distill|dehydrator|flotation|isamill|electromagnetic/],
+  ['Furnaces & smelting', /^smelting$|blastfurnace|alloysmelter|alloyblastsmelter|arcfurnace|plasmaarc|furnace|cokeoven|pyrolyse|smelter/],
+  ['Chemistry & mixing', /chemical|mixer|autoclave|fluidchemicaleactor|brewer|ferment|fluidheater|cauldron|plant/],
+  ['Cooling & fluids', /vacuumfreezer|freezer|extractor|fluidcanner|canner|solidifier/],
+  ['Forming & compression', /compressor|implosion|extruder|press|bender|lathe|cuttingsaw|wiremill|polarizer|forge|packager|cable|chisel/],
+  ['Assembly & crafting', /assembler|crafting|circuit|assemblyline|engraver/],
+];
+const catOf = mi => { const id = M[mi][0].toLowerCase(); const c = CATEGORIES.find(([, re]) => re.test(id)); return c ? c[0] : 'Other machines'; };
+const visibleRecipes = mi => byMachine[mi].filter(ri => !(opt.dup && dupHidden[ri]) && !(opt.recycle && isRecycling(ri, -1)));
+let topDustCache = {};
+function topDusts(mi) {
+  if (topDustCache[mi]) return topDustCache[mi];
+  const c = new Map();
+  byMachine[mi].forEach(ri => D.recipes[ri][1].forEach(s => { if (isDust(s[0])) c.set(s[0], (c.get(s[0]) || 0) + 1); }));
+  return (topDustCache[mi] = [...c.entries()].sort((a, b) => b[1] - a[1]).slice(0, 8).map(e => e[0]));
+}
+function showMachines() {
+  setView('machines', 'Machines');
+  const cats = new Map();
+  M.forEach((_, mi) => { const n = visibleRecipes(mi).length; if (!n) return; const c = catOf(mi); if (!cats.has(c)) cats.set(c, []); cats.get(c).push([mi, n]); });
+  const order = [...CATEGORIES.map(c => c[0]), 'Other machines'];
+  $('#page').innerHTML = `<h2>Machines</h2>
+    <p class="sub">Every machine that takes or makes a dust, grouped by what it does. Open one to see each recipe's dust inputs and results.</p>
+    ${order.filter(c => cats.has(c)).map(c => `<section class="cat"><h3>${esc(c)}</h3><div class="mgrid">${cats.get(c).sort((a, b) => b[1] - a[1]).map(([mi, n]) =>
+      `<a class="mcard" href="#m${mi}"><b>${esc(M[mi][1])}</b><span class="count">${n.toLocaleString()} recipes</span><span class="row">${topDusts(mi).map(d => iconHTML(d, 20)).join('')}</span></a>`).join('')}</div></section>`).join('')}`;
+  window.scrollTo({ top: 0 });
+}
+
+// ---------- page: one machine ----------
+const machState = { mi: -1, q: '', role: 'any', sort: 'default', lim: 120 };
+function showMachine(mi) {
+  if (machState.mi !== mi) { machState.mi = mi; machState.lim = 120; }
+  setView('machine', M[mi][1]);
+  const cat = catOf(mi);
+  const sibs = M.map((_, i) => i).filter(i => catOf(i) === cat).map(i => [i, visibleRecipes(i).length]).filter(x => x[1]).sort((a, b) => b[1] - a[1]);
+  $('#page').innerHTML = `<div class="crumbs"><a href="#machines">Machines</a> / ${esc(cat)}</div>
+    <h2>${esc(M[mi][1])}</h2>
+    <div class="mtabs">${sibs.map(([i, n]) => `<a href="#m${i}"${i === mi ? ' aria-current="page"' : ''}>${esc(M[i][1])}<span class="n">${n.toLocaleString()}</span></a>`).join('')}</div>
+    <div class="controls">
+      <input type="search" id="mq" placeholder="Filter by dust or item, e.g. iron, Fe, tiny" value="${esc(machState.q)}" aria-label="Filter recipes">
+      <div class="seg" role="group" aria-label="Where the dust is">
+        <button data-role="any" aria-pressed="${machState.role === 'any'}">Any</button><button data-role="in" aria-pressed="${machState.role === 'in'}">Dust goes in</button><button data-role="out" aria-pressed="${machState.role === 'out'}">Dust comes out</button>
+      </div>
+      <select id="msort" aria-label="Sort recipes">
+        <option value="default">Sort: simplest first</option><option value="eu">Sort: lowest EU/t</option><option value="eud">Sort: highest EU/t</option><option value="time">Sort: fastest</option><option value="name">Sort: first input name</option>
+      </select>
+      <span class="count" id="mcount"></span>
+    </div>
+    <div id="mlist"></div>`;
+  $('#msort').value = machState.sort;
+  renderMachineList();
+  window.scrollTo({ top: 0 });
+}
+function renderMachineList() {
+  if (view !== 'machine') return;
+  const mi = machState.mi, words = machState.q.trim().toLowerCase().split(/\s+/).filter(Boolean);
+  let match = null;
+  if (words.length) { match = new Set(); N.forEach((_, i) => { if (words.every(w => searchIdx[i].s.includes(w))) match.add(i); }); }
+  const hit = (stacks, needDust) => stacks.some(s => (match ? match.has(s[0]) : true) && (!needDust || isDust(s[0])));
+  let l = visibleRecipes(mi).filter(ri => {
+    const r = D.recipes[ri];
+    if (machState.role === 'in') return hit(r[1], !match);
+    if (machState.role === 'out') return hit(r[2], !match);
+    return !match || hit(r[1]) || hit(r[2]);
+  });
+  const R = D.recipes, nm = ri => (R[ri][1][0] ? N[R[ri][1][0][0]].n : '').toLowerCase();
+  const sorts = {
+    default: (a, b) => (R[a][1].length - R[b][1].length) || Math.abs(R[a][3]) - Math.abs(R[b][3]),
+    eu: (a, b) => Math.abs(R[a][3]) - Math.abs(R[b][3]), eud: (a, b) => Math.abs(R[b][3]) - Math.abs(R[a][3]),
+    time: (a, b) => R[a][4] - R[b][4], name: (a, b) => nm(a).localeCompare(nm(b)) };
+  l.sort(sorts[machState.sort] || sorts.default);
+  $('#mcount').textContent = `${l.length.toLocaleString()} recipes`;
+  const shown = l.slice(0, machState.lim), rest = l.length - shown.length;
+  $('#mlist').innerHTML = l.length
+    ? `<div class="rgrid">${shown.map(ri => recipeHTML(ri, match || -1)).join('')}</div>${rest > 0 ? `<button class="more" data-mmore>Show ${Math.min(rest, 120)} more of ${rest.toLocaleString()}</button>` : ''}`
+    : `<div class="empty">No recipes in this machine match${machState.q ? ` “${esc(machState.q)}”` : ''}.</div>`;
+}
+
+// ---------- page interactions ----------
+let typing;
+$('#page').addEventListener('input', e => {
+  clearTimeout(typing);
+  if (e.target.id === 'dq') typing = setTimeout(() => { dustState.q = e.target.value; renderDustList(); }, 120);
+  if (e.target.id === 'mq') typing = setTimeout(() => { machState.q = e.target.value; machState.lim = 120; renderMachineList(); }, 160);
+});
+$('#page').addEventListener('change', e => {
+  if (e.target.id === 'dsort') { dustState.sort = e.target.value; renderDustList(); }
+  if (e.target.id === 'msort') { machState.sort = e.target.value; renderMachineList(); }
+});
+$('#page').addEventListener('click', e => {
+  const n = e.target.closest('.st, .dcard'); if (n) { go(+n.dataset.n); return; }
+  const p = e.target.closest('[data-p]');
+  if (p) { dustState.p = p.dataset.p; p.parentElement.querySelectorAll('button').forEach(b => b.setAttribute('aria-pressed', b === p)); renderDustList(); return; }
+  const r = e.target.closest('[data-role]');
+  if (r) { machState.role = r.dataset.role; machState.lim = 120; r.parentElement.querySelectorAll('button').forEach(b => b.setAttribute('aria-pressed', b === r)); renderMachineList(); return; }
+  if (e.target.closest('[data-mmore]')) { machState.lim += 120; renderMachineList(); return; }
+  const L = e.target.closest('[data-letter]');
+  if (L) { e.preventDefault(); const el = document.getElementById('L-' + (L.dataset.letter === '#' ? 'num' : L.dataset.letter)); if (el) el.scrollIntoView({ behavior: 'smooth' }); }
+});
+$('#page').addEventListener('keydown', e => {
+  if ((e.key === 'Enter' || e.key === ' ') && e.target.closest('.st')) { e.preventDefault(); e.target.closest('.st').click(); }
+});
 
 // ---------- tooltip ----------
 const tt = $('#tt');
@@ -481,7 +763,7 @@ function moveTT(ev) {
   tt.style.left = Math.max(8, x) + 'px'; tt.style.top = Math.max(8, y) + 'px';
 }
 function hideTT() { tt.hidden = true; }
-document.addEventListener('mouseover', e => { const st = e.target.closest('.st, .res, .crumb, .sib'); if (st && st.dataset.n) showTT(st, e); else if (!e.target.closest('.st')) hideTT(); });
+document.addEventListener('mouseover', e => { const st = e.target.closest('.st, .res, .crumb, .sib, .dcard'); if (st && st.dataset.n) showTT(st, e); else if (!e.target.closest('.st')) hideTT(); });
 document.addEventListener('mousemove', e => { if (!tt.hidden) moveTT(e); });
 document.addEventListener('focusin', e => { const st = e.target.closest('.st'); if (st) { const r = st.getBoundingClientRect(); showTT(st, { clientX: r.right, clientY: r.top }); } });
 document.addEventListener('focusout', hideTT);
@@ -522,7 +804,7 @@ q.addEventListener('keydown', e => {
 });
 res.addEventListener('mousedown', e => { const r = e.target.closest('.res'); if (r) { e.preventDefault(); pick(+r.dataset.n); } });
 document.addEventListener('click', e => { if (!e.target.closest('.search')) res.hidden = true; });
-document.addEventListener('keydown', e => { if (e.key === '/' && document.activeElement !== q) { e.preventDefault(); q.focus(); q.select(); } });
+document.addEventListener('keydown', e => { if (e.key === '/' && !e.target.closest('input, select, textarea')) { e.preventDefault(); q.focus(); q.select(); } });
 })();
 </script>
 </body>

@@ -4,7 +4,7 @@ Tools for GregTech: New Horizons. Each tool lives in its own folder and is publi
 
 | Tool | Folder | What it is |
 | --- | --- | --- |
-| Dust Atlas | [`dust-atlas/`](dust-atlas/) | Searchable flowchart of every dust: what makes it and what each machine turns it into. Served at `/dust-atlas/`. |
+| Dust Atlas | [`dust-atlas/`](dust-atlas/) | Every dust as a clickable flowchart, plus an all-dusts list and per-machine recipe pages. Served at `/dust-atlas/`. |
 
 ## Layout
 
